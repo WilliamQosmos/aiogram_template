@@ -150,6 +150,6 @@ dmypy.json
 /temp/
 /config/
 
-docker-compose.yml
-docker-compose-stack.yml!
-alembic_dev.ini
+
+!/docker-compose-stack.yml
+!/alembic_dev.ini
