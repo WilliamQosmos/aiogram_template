@@ -8,10 +8,10 @@ services:
     image: williamqosmos/aiogram_template
     volumes:
       - type: "bind"
-        source: "/Users/williamqosmos/PycharmProjects/aiogram_template/log"
+        source: "{$HOME}/aiogram_template/log"
         target: "/log"
       - type: "bind"
-        source: "/Users/williamqosmos/PycharmProjects/aiogram_template/config"
+        source: "{$HOME}/aiogram_template/config"
         target: "/config"
     entrypoint: [ "python3", "-m", "app"]
     networks:
