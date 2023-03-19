@@ -1,0 +1,107 @@
+version: '3.7'
+
+services:
+
+  template_bot:
+    container_name: template_bot
+    restart: always
+    image: williamqosmos/aiogram_template
+    volumes:
+      - type: "bind"
+        source: "${HOME}/TemplateBot/log"
+        target: "/log"
+      - type: "bind"
+        source: "./config"
+        target: "/config"
+    env_file: config/.env
+    entrypoint: [ "python3", "-m", "app"]
+    networks:
+      network:
+        ipv4_address: 172.20.0.15
+      botapi:
+      reverse-proxy:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  telegram-bot-api:
+    image: aiogram/telegram-bot-api:latest
+    environment:
+      TELEGRAM_API_ID: "6"
+      TELEGRAM_API_HASH: "eb06d4abfb49dc3eeb1aeb98ae0f581e"
+      TELEGRAM_LOCAL: 1
+    volumes:
+      - telegram-bot-api-data:/var/lib/telegram-bot-api
+    networks:
+      network:
+        ipv4_address: 172.20.0.14
+      botapi:
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - telegram-bot-api-data:/usr/share/nginx/html/var/lib/telegram-bot-api:ro
+    environment:
+      - NGINX_PORT=80
+    networks:
+      network:
+        ipv4_address: 172.20.0.13
+      botapi:
+
+
+  postgres:
+    image: postgres:latest
+
+    environment:
+      POSTGRES_DB: "postgres"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "strongPASSWORDforPoStGrEs"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d postgres" ]
+      interval: 15s
+      timeout: 10s
+      retries: 7
+      start_period: 12s
+    restart: unless-stopped
+    networks:
+      network:
+        ipv4_address: 172.20.0.11
+
+  redis:
+    image: redis/redis-stack-server:latest
+
+    restart: always
+    ports:
+      - "6379:6379"
+
+    volumes:
+      - redis_data:/var/lib/redis
+
+    environment:
+      - REDIS_REPLICATION_MODE=master
+      - REDIS_ARGS=--save 20 1 --loglevel warning --requirepass passFORredis
+    networks:
+      network:
+        ipv4_address: 172.20.0.12
+
+volumes:
+  telegram-bot-api-data:
+  db_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  reverse-proxy:
+    external:
+      name: nginx-revers-proxy
+  network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16
