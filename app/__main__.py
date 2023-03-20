@@ -3,6 +3,8 @@ import os
 from pathlib import Path
 
 from aiogram import Dispatcher, Bot
+from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.fsm.storage.redis import RedisStorage
 from sqlalchemy.orm import close_all_sessions
 
 from app.config import load_config
@@ -11,7 +13,6 @@ from app.handlers import setup_handlers
 from app.middlewares import setup_middlewares
 from app.models.config.main import Paths
 from app.models.db import create_pool
-from aiogram.enums.chat_type import ChatType
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +23,12 @@ def main():
     setup_logging(paths)
     config = load_config(paths)
 
-    dp = Dispatcher()
+    if config.bot.storage.is_local:
+        storage = MemoryStorage()
+    else:
+        storage = RedisStorage(config.redis.create_redis)
+
+    dp = Dispatcher(storage=storage)
     setup_middlewares(dp, create_pool(config.db), config.bot)
     setup_handlers(dp, config.bot)
     bot = Bot(
