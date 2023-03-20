@@ -52,6 +52,7 @@ class BotConfig:
     token: str
     log_chat: int
     superusers: list[int]
+    storage: StorageConfig
     bot_api: BotApiConfig
 
     def create_session(self) -> AiohttpSession | None:
@@ -79,6 +80,20 @@ class BotApiConfig:
         )
 
 
+@dataclass
+class StorageConfig:
+    type: StorageType
+
+    @property
+    def is_local(self) -> bool:
+        return self.type == StorageType.memory
+
+
 class BotApiType(Enum):
     official = "official"
     local = "local"
+
+
+class StorageType(Enum):
+    redis = "redis"
+    memory = "memory"

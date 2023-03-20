@@ -5,7 +5,7 @@ import yaml
 from app.config.db import load_db_config
 from app.config.redis import load_redis_config
 from app.models.config import Config
-from app.models.config.main import Paths, BotConfig, BotApiConfig, BotApiType
+from app.models.config.main import Paths, BotConfig, BotApiConfig, BotApiType, StorageType, StorageConfig
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +18,7 @@ def load_config(paths: Paths) -> Config:
         paths=paths,
         db=load_db_config(config_dct["db"]),
         bot=load_bot_config(config_dct["bot"]),
-        redis=load_redis_config(config_dct["bot"]),
+        redis=load_redis_config(config_dct["redis"]),
     )
 
 
@@ -27,7 +27,8 @@ def load_bot_config(dct: dict) -> BotConfig:
         token=dct["token"],
         log_chat=dct["log_chat"],
         superusers=dct["superusers"],
-        bot_api=load_botapi(dct["botapi"])
+        bot_api=load_botapi(dct["botapi"]),
+        storage=load_storage(dct["storage"])
     )
 
 
@@ -36,4 +37,10 @@ def load_botapi(dct: dict) -> BotApiConfig:
         type=BotApiType[dct["type"]],
         botapi_url=dct.get("botapi_url", None),
         botapi_file_url=dct.get("file_url", None),
+    )
+
+
+def load_storage(dct: dict) -> StorageConfig:
+    return StorageConfig(
+        type=StorageType[dct["type"]],
     )
