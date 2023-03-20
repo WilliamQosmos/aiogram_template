@@ -17,19 +17,6 @@ class RedisConfig:
     db: Optional[int] = None
 
     @property
-    def uri(self):
-        if self.user:
-            url = (
-                f'redis://'
-                f'{self.user}:{self.password}'
-                f'@{self.host}:{self.port}/{self.db}'
-            )
-        else:
-            raise ValueError("Username Redis not available")
-        logger.debug(url)
-        return url
-
-    @property
     def create_redis(self) -> Redis:
         """
         Implementation of the Redis protocol.
