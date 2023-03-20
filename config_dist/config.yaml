@@ -18,3 +18,10 @@ db:
   login: postgres
   password: postgres
   name: aiogram_template_bot
+
+redis:
+  host: localhost
+  port: 6379
+  password: strongpassword
+  db: 0
+  # user: redis  # optional parameter
