@@ -3,6 +3,7 @@ import logging.config
 import yaml
 
 from app.config.db import load_db_config
+from app.config.redis import load_redis_config
 from app.models.config import Config
 from app.models.config.main import Paths, BotConfig, BotApiConfig, BotApiType
 
@@ -17,6 +18,7 @@ def load_config(paths: Paths) -> Config:
         paths=paths,
         db=load_db_config(config_dct["db"]),
         bot=load_bot_config(config_dct["bot"]),
+        redis=load_redis_config(config_dct["bot"]),
     )
 
 

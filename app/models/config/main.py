@@ -7,6 +7,7 @@ from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.client.telegram import TelegramAPIServer
 
 from app.models.config.db import DBConfig
+from app.models.config.redis import RedisConfig
 
 
 @dataclass
@@ -14,6 +15,7 @@ class Config:
     paths: Paths
     db: DBConfig
     bot: BotConfig
+    redis: RedisConfig
 
     @property
     def app_dir(self) -> Path:
