@@ -3,6 +3,8 @@ bot:
   log_chat: -1001234567890
   superusers:
     - 666
+  storage:
+    type: redis # or memory
   botapi:
     # can be official (api.telegram.org)
     type: official
