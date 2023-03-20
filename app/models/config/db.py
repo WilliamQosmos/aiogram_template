@@ -1,21 +1,21 @@
 from dataclasses import dataclass
 
 import logging
-
+from typing import Optional
 
 logger = logging.getLogger(__name__)
 
 
 @dataclass
 class DBConfig:
-    type: str = None
-    connector: str = None
-    host: str = None
-    port: int = None
-    login: str = None
-    password: str = None
-    name: str = None
-    path: str = None
+    type: Optional[str] = None
+    connector: Optional[str] = None
+    host: Optional[str] = None
+    port: Optional[int] = None
+    login: Optional[str] = None
+    password: Optional[str] = None
+    name: Optional[str] = None
+    path: Optional[str] = None
 
     @property
     def uri(self):
