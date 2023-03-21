@@ -2,10 +2,10 @@ from aiogram import Bot, Router
 from aiogram.filters import Command
 from aiogram.types import Message
 
-from app.filters.superusers import SuperUserFilter
+from app.middlewares.superuser_middleware import SuperUserMiddleware
 
 router = Router(name=__name__)
-router.message.filter(SuperUserFilter)
+router.message.middleware(SuperUserMiddleware())
 
 @router.message(Command(commands="exception"))
 async def exception(message: Message):

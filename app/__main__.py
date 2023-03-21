@@ -28,7 +28,7 @@ def main():
     else:
         storage = RedisStorage(config.redis.create_redis)
 
-    dp = Dispatcher(storage=storage)
+    dp = Dispatcher(storage=storage, config=config.bot)
     setup_middlewares(dp, create_pool(config.db), config.bot)
     setup_handlers(dp, config.bot)
     bot = Bot(
@@ -39,7 +39,7 @@ def main():
 
     logger.info("started")
     try:
-        dp.run_polling(bot)
+        dp.run_polling(bot, allowed_updates=dp.resolve_used_update_types())
     finally:
         close_all_sessions()
         logger.info("stopped")
