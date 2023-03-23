@@ -10,9 +10,9 @@ from sqlalchemy.orm import close_all_sessions
 from app.config import load_config
 from app.config.logging_config import setup_logging
 from app.handlers import setup_handlers
-from app.middlewares import setup_middlewares
+from app.middlewares.data_load_middleware import LoadDataMiddleware
+from app.middlewares.db_middleware import DBMiddleware
 from app.models.config.main import Paths
-from app.models.db import create_pool
 
 logger = logging.getLogger(__name__)
 
@@ -28,8 +28,9 @@ def main():
     else:
         storage = RedisStorage(config.redis.create_redis)
 
-    dp = Dispatcher(storage=storage, config=config.bot)
-    setup_middlewares(dp, create_pool(config.db), config.bot)
+    dp = Dispatcher(storage=storage, config=config)
+    dp.message.middleware(DBMiddleware())
+    dp.message.middleware(LoadDataMiddleware())
     setup_handlers(dp, config.bot)
     bot = Bot(
         token=config.bot.token,

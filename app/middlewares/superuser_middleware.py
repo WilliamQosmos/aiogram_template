@@ -3,7 +3,7 @@ from typing import Callable, Dict, Any, Awaitable
 from aiogram import BaseMiddleware
 from aiogram.types import Message
 
-from app.models.config.main import BotConfig
+from app.models.config.main import Config
 
 
 class SuperUserMiddleware(BaseMiddleware):
@@ -13,8 +13,8 @@ class SuperUserMiddleware(BaseMiddleware):
         event: Message,
         data: Dict[str, Any]
     ) -> Any:
-        config: BotConfig = data['config']
-        if event.from_user.id in config.superusers:
+        config: Config = data['config']
+        if event.from_user.id in config.bot.superusers:
             return await handler(event, data)
         else:
             return await event.answer('Вы не суперпользователь')
