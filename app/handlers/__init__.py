@@ -1,6 +1,8 @@
 import logging
+from typing import Generator, Tuple
 
-from aiogram import Dispatcher
+from aiogram import Dispatcher, Router
+from aiogram.filters import Command
 
 from app.handlers.base import router as base
 from app.handlers.errors import setup_errors
@@ -14,4 +16,19 @@ def setup_handlers(dp: Dispatcher, bot_config: BotConfig):
     setup_errors(dp, bot_config.log_chat)
     dp.include_router(base)
     dp.include_router(superuser)
+    base_commands = collect_commands(base)
+    superuser_commands = collect_commands(superuser)
+    commands = [*base_commands, *superuser_commands]
+    logger.debug(commands)
     logger.debug("handlers configured successfully")
+    return commands
+
+
+def collect_commands(router: Router) -> Generator[Tuple[Command, str], None, None]:
+    for handler in router.message.handlers:
+        if "commands" not in handler.flags:
+            continue
+        for command in handler.flags["commands"]:
+            yield {"command": command.commands[0], "description": handler.callback.__doc__ or "No description available"}
+    for sub_router in router.sub_routers:
+        yield from collect_commands(sub_router)
