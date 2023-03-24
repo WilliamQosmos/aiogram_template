@@ -4,8 +4,8 @@ from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
 
 from app.dao.holder import HolderDao
-from app.models.config import Config
-from app.models.db import create_pool
+
+from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 
 
 class DBMiddleware(BaseMiddleware):
@@ -16,8 +16,8 @@ class DBMiddleware(BaseMiddleware):
             event: TelegramObject,
             data: dict[str, Any]
     ) -> Any:
-        config: Config = data.get('config')
-        async with create_pool(config.db) as session:
+        pool: async_sessionmaker[AsyncSession] = data['db_pool']
+        async with pool() as session:
             holder_dao = HolderDao(session)
             data["dao"] = holder_dao
             result = await handler(event, data)

@@ -13,6 +13,7 @@ from app.handlers import setup_handlers
 from app.middlewares.data_load_middleware import LoadDataMiddleware
 from app.middlewares.db_middleware import DBMiddleware
 from app.models.config.main import Paths
+from app.models.db import create_pool
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +29,7 @@ def main():
     else:
         storage = RedisStorage(config.redis.create_redis)
 
-    dp = Dispatcher(storage=storage, config=config)
+    dp = Dispatcher(storage=storage, config=config, db_pool=create_pool(config.db))
     dp.message.middleware(DBMiddleware())
     dp.message.middleware(LoadDataMiddleware())
     setup_handlers(dp, config.bot)
