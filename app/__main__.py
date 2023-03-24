@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import os
 from pathlib import Path
@@ -18,7 +19,7 @@ from app.models.db import create_pool
 logger = logging.getLogger(__name__)
 
 
-def main():
+async def main():
     paths = get_paths()
 
     setup_logging(paths)
@@ -38,10 +39,12 @@ def main():
         parse_mode="HTML",
         session=config.bot.create_session(),
     )
+    commands = setup_handlers(dp, config.bot)
+    await bot.set_my_commands(commands=commands)
 
     logger.info("started")
     try:
-        dp.run_polling(bot, allowed_updates=dp.resolve_used_update_types())
+        await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
     finally:
         close_all_sessions()
         logger.info("stopped")
@@ -54,4 +57,4 @@ def get_paths() -> Paths:
 
 
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())
