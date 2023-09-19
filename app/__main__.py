@@ -20,7 +20,7 @@ async def main():
     setup_logging()
     config = Config()
 
-    if config.bot.storage.is_local:
+    if config.storage_is_local:
         storage = MemoryStorage()
     else:
         storage = RedisStorage(config.create_redis)
