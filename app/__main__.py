@@ -28,13 +28,12 @@ async def main():
     dp = Dispatcher(storage=storage, config=config, db_pool=config.create_db_pool)
     dp.message.middleware(DBMiddleware())
     dp.message.middleware(LoadDataMiddleware())
-    setup_handlers(dp, config)
     bot = Bot(
         token=config.TG_BOT_TOKEN,
         parse_mode="HTML",
         session=config.create_bot_session(),
     )
-    commands = setup_handlers(dp, config.bot)
+    commands = setup_handlers(dp, config)
     await bot.set_my_commands(commands=commands)
 
     logger.info("started")
