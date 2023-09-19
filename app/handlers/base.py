@@ -15,13 +15,16 @@ logger = logging.getLogger(__name__)
 
 router = Router(name=__name__)
 
+
 @router.message(Command("start"))
 async def start_cmd(message: Message):
+    """Start"""
     await message.reply("Hi!")
 
 
 @router.message(Command(commands=["idchat", "chat_id", "id"], prefix="/!"))
 async def chat_id(message: Message):
+    """Get chat id"""
     text = (
         f"chat_id: {hd.pre(message.chat.id)}\n"
         f"your user_id: {hd.pre(message.from_user.id)}"
@@ -36,13 +39,12 @@ async def chat_id(message: Message):
 
 @router.message(Command(commands="cancel"))
 async def cancel_state(message: Message, state: FSMContext):
+    """Cancel all state"""
     current_state = await state.get_state()
     if current_state is None:
         return
     logger.info('Cancelling state %s', current_state)
-    # Cancel state and inform user about it
     await state.clear()
-    # And remove keyboard (just in case)
     await message.reply('Dialog stopped, data removed', reply_markup=ReplyKeyboardRemove())
 
 

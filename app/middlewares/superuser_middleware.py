@@ -14,7 +14,7 @@ class SuperUserMiddleware(BaseMiddleware):
         data: Dict[str, Any]
     ) -> Any:
         config: Config = data['config']
-        if event.from_user.id in config.bot.superusers:
+        if event.from_user.id in config.superusers:
             return await handler(event, data)
         else:
             return await event.answer('Вы не суперпользователь')

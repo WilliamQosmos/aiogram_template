@@ -1,4 +1,1 @@
-from .main import load_config
-
-
-__all__ = [load_config]
+from .logging_config import setup_logging

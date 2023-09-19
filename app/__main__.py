@@ -1,43 +1,38 @@
 import asyncio
 import logging
-import os
-from pathlib import Path
 
 from aiogram import Dispatcher, Bot
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.fsm.storage.redis import RedisStorage
 from sqlalchemy.orm import close_all_sessions
 
-from app.config import load_config
-from app.config.logging_config import setup_logging
+from app.config import setup_logging
+from app.models.config import Config
 from app.handlers import setup_handlers
 from app.middlewares.data_load_middleware import LoadDataMiddleware
 from app.middlewares.db_middleware import DBMiddleware
-from app.models.config.main import Paths
-from app.models.db import create_pool
 
 logger = logging.getLogger(__name__)
 
 
 async def main():
-    paths = get_paths()
 
-    setup_logging(paths)
-    config = load_config(paths)
+    setup_logging()
+    config = Config()
 
     if config.bot.storage.is_local:
         storage = MemoryStorage()
     else:
-        storage = RedisStorage(config.redis.create_redis)
+        storage = RedisStorage(config.create_redis)
 
-    dp = Dispatcher(storage=storage, config=config, db_pool=create_pool(config.db))
+    dp = Dispatcher(storage=storage, config=config, db_pool=config.create_db_pool)
     dp.message.middleware(DBMiddleware())
     dp.message.middleware(LoadDataMiddleware())
-    setup_handlers(dp, config.bot)
+    setup_handlers(dp, config)
     bot = Bot(
-        token=config.bot.token,
+        token=config.TG_BOT_TOKEN,
         parse_mode="HTML",
-        session=config.bot.create_session(),
+        session=config.create_bot_session(),
     )
     commands = setup_handlers(dp, config.bot)
     await bot.set_my_commands(commands=commands)
@@ -48,12 +43,6 @@ async def main():
     finally:
         close_all_sessions()
         logger.info("stopped")
-
-
-def get_paths() -> Paths:
-    if path := os.getenv("BOT_PATH"):
-        return Paths(Path(path))
-    return Paths(Path(__file__).parent.parent)
 
 
 if __name__ == '__main__':

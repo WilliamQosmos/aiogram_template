@@ -1,9 +1,11 @@
-pyyaml~=6.0
 colorlog~=6.7.0
-aiogram>=3.0.0b7
-aiogram_dialog>=2.0.0b17
+aiogram~=3.0.0
+aiogram_dialog~=2.0.0
 sqlalchemy==2.0.6
 alembic==1.10.2
 asyncpg~=0.27
 ujson==5.7.0
-redis==4.5.4
+redis~=5.0.0
+pydantic~=2.3.0
+pydantic-settings~=2.0.3
+PyYAML~=6.0.1

@@ -1,15 +1,15 @@
 import logging.config
+from pathlib import Path
 
 import yaml
 
-from app.models.config.main import Paths
 
 logger = logging.getLogger(__name__)
 
 
-def setup_logging(paths: Paths):
+def setup_logging():
     try:
-        with paths.logging_config_file.open("r") as f:
+        with open(Path("app/config/logging.yaml"), "r") as f:
             logging_config = yaml.safe_load(f)
         logging.config.dictConfig(logging_config)
         logger.info("Logging configured successfully")

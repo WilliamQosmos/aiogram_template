@@ -5,9 +5,14 @@ from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import AsyncEngine
 from sqlalchemy.future import create_engine
 
+from app.models.config import Config
 from app.models.db import Base
 
 config = context.config
+env_config = Config()
+config.set_main_option(
+    "sqlalchemy.url", env_config.db_uri
+)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
